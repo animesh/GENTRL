@@ -13,15 +13,15 @@
 #check setup
 import os
 print(os)
-system("jupyter" "notebook" "list")#token
+#system("jupyter" "notebook" "list")#token
 #pre-train https://github.com/insilicomedicine/GENTRL/blob/master/examples/pretrain.ipynb
 import pandas as pd
-! wget https://media.githubusercontent.com/media/molecularsets/moses/master/data/dataset_v1.csv
+#! wget https://media.githubusercontent.com/media/molecularsets/moses/master/data/dataset_v1.csv
 df = pd.read_csv("dataset_v1.csv")
 df = df[df['SPLIT'] == 'train']
 import gentrl
 import torch
-#torch.cuda.set_device(0)
+torch.cuda.set_device(0)
 from moses.metrics import mol_passes_filters, QED, SA, logP
 from moses.metrics.utils import get_n_rings, get_mol
 def get_num_rings_6(mol):
@@ -40,7 +40,7 @@ df.to_csv('train_plogp_plogpm.csv', index=None)
 enc = gentrl.RNNEncoder(latent_size=50)
 dec = gentrl.DilConvDecoder(latent_input_size=50)
 model = gentrl.GENTRL(enc, dec, 50 * [('c', 20)], [('c', 20)], beta=0.001)
-#model.cuda();
+model.cuda();
 md = gentrl.MolecularDataset(sources=[
     {'path':'train_plogp_plogpm.csv',
      'smiles': 'SMILES',
@@ -51,11 +51,12 @@ md = gentrl.MolecularDataset(sources=[
 from torch.utils.data import DataLoader
 train_loader = DataLoader(md, batch_size=50, shuffle=True, num_workers=1, drop_last=True)
 model.train_as_vaelp(train_loader, lr=1e-4)
-! mkdir -p saved_gentrl
+#! mkdir -p saved_gentrl
 model.save('./saved_gentrl/')
 #train-RL https://github.com/insilicomedicine/GENTRL/blob/master/examples/train_rl.ipynb
 model.load('./saved_gentrl/')
-#model.cuda();
+model.cuda();
+model.load('./saved_gentrl/')
 from moses.utils import disable_rdkit_log
 disable_rdkit_log()
 def get_num_rings_6(mol):
@@ -70,7 +71,7 @@ def penalized_logP(mol_or_smiles, masked=False, default=-5):
         return default
     return reward
 model.train_as_rl(penalized_logP)
-! mkdir -p saved_gentrl_after_rl
+#! mkdir -p saved_gentrl_after_rl
 model.save('./saved_gentrl_after_rl/')
 #sample https://github.com/insilicomedicine/GENTRL/blob/master/examples/sampling.ipynb
 from rdkit.Chem import Draw

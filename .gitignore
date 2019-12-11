@@ -1,0 +1,19 @@
+# cp ../../scripts/.gitignore .
+*
+!*.*
+.Rproj.user
+*.pdf
+*.asv
+*.csv
+*.txt
+*.history
+*.Rhistory
+*swp
+*fa
+Homo*
+*sam
+*bam
+*gz
+*tsv
+core*
+#.ipynb_checkpoints*
